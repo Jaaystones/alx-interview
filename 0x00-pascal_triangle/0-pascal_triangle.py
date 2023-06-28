@@ -2,6 +2,7 @@
 '''A code for working with Pascal's triangle.
 '''
 
+
 def pascal_triangle(n):
     if n <= 0:
         return []
