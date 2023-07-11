@@ -9,7 +9,7 @@ to copy everything and one to paste.
 import math
 
 
-def min_operations(n):
+def minOperations(n):
     """
     Calculates the fewest number of operations needed to achieve exactly n 'H' characters in a text file.
 
