@@ -13,7 +13,7 @@ def minOperations(n):
     clipboard = 0
     paste = 1
     # print('H', end='')
-    while done < n:
+    while paste < n:
         if clipboard == 0:
             # init (the first copy all and paste)
             clipboard = paste
