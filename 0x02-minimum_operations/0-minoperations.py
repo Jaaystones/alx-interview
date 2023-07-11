@@ -11,13 +11,15 @@ import math
 
 def minOperations(n):
     """
-    Calculates the fewest number of operations needed to achieve exactly n 'H' characters in a text file.
+    Calculates the fewest number of operations needed to
+    achieve exactly n 'H' characters in a text file.
 
     Args:
         n (int): The desired number of 'H' characters.
 
     Returns:
-        int: The fewest number of operations needed. Returns 0 if it is impossible to achieve.
+        int: The fewest number of operations needed.
+        Returns 0 if it is impossible to achieve.
 
     """
     if n == 1:
@@ -34,4 +36,4 @@ def minOperations(n):
         return n
 
     # Perform "Copy All" once and "Paste" smallest_factor - 1 times
-    return 1 + min_operations(n // smallest_factor)
+    return 1 + minOperations(n // smallest_factor)
