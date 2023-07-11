@@ -1,34 +1,35 @@
 #!/usr/bin/python3
-"""
-Calculates the minimum number of operations
-required to create a certain number of characters
-given that there is only one function to copy everything
-and one to paste.
-"""
+'''The minimum operations coding challenge using python.
+'''
 
 
-def min_operations(n):
-    """
-    Calculates the minimum number of operations
-    required to create 'n' characters.
-
-    Args:
-        n (int): The desired number of characters.
-
-    Returns:
-        int: The minimum number of operations required.
-        Returns 0 if 'n' is less than or equal to 1.
-
-    """
-    p = 0
-
-    if n <= 1:
-        return p
-
-    for i in range(2, n + 1):
-        while 0 == n % i:
-            p = p + i
-            n = n / i
-            if n < i:
-                break
-    return p
+def minOperations(n):
+    '''Computes the fewest number of operations needed to result
+    in exactly n H characters.
+    '''
+    if not isinstance(n, int):
+        return 0
+    ops_count = 0
+    clipboard = 0
+    done = 1
+    # print('H', end='')
+    while done < n:
+        if clipboard == 0:
+            # init (the first copy all and paste)
+            clipboard = done
+            done += clipboard
+            ops_count += 2
+            # print('-(11)->{}'.format('H' * done), end='')
+        elif n - done > 0 and (n - done) % done == 0:
+            # copy all and paste
+            clipboard = done
+            done += clipboard
+            ops_count += 2
+            # print('-(11)->{}'.format('H' * done), end='')
+        elif clipboard > 0:
+            # paste
+            done += clipboard
+            ops_count += 1
+            # print('-(01)->{}'.format('H' * done), end='')
+    # print('')
+    return ops_count
