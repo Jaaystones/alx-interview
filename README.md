@@ -1,2 +1,2 @@
 # alx-interview
-This is a file on pascal triangle
+This is a repository on different codding tasks
