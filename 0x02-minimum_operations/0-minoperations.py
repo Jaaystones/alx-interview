@@ -1,23 +1,22 @@
 #!/usr/bin/python3
-'''Task
 '''
-
-import math
+calculates the minimum amount of processes necessary
+to create a certain number of characters.
+You must imagine that there is only one function
+to copy everything and one to paste.
+'''
 
 
 def minOperations(n):
-    if n == 1:
-        return 0
+    p = 0
 
-    # Finding the smallest factor of n
-    smallest_factor = None
-    for i in range(2, int(math.sqrt(n)) + 1):
-        if n % i == 0:
-            smallest_factor = i
-            break
+    if n <= 1:
+        return p
 
-    if smallest_factor is None:
-        return n
-
-    # Perform "Copy All" once and "Paste" smallest_factor - 1 times
-    return 1 + minOperations(n // smallest_factor)
+    for i in range(2, n + 1):
+        while (0 == n % i):
+            p = p + i
+            n = n / i
+            if n < i:
+                break
+    return p
