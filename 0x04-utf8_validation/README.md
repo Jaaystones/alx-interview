@@ -11,3 +11,7 @@ This project contains interview coding challenges.
   + The data set can contain multiple characters.
   + The data will be represented by a list of integers.
   + Each integer represents 1 byte of data, therefore you only need to handle the 8 least significant bits of each integer.
+
+ ##  Resources:book:
+ * [Uft-8](https://en.wikipedia.org/wiki/UTF-8)
+ * [Uft-8](https://www.youtube.com/watch?v=MijmeoH9LT4)
