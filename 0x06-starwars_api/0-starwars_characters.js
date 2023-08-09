@@ -1,49 +1,64 @@
 #!/usr/bin/env node
 
-const request = require('request-promise-native');
+const request = require('request');
 
-const movieId = process.argv[2];
-const filmEndPoint = `https://swapi-api.hbtn.io/api/films/${movieId}`;
-const names = [];
-
-const requestCharacters = async () => {
-  try {
-    const response = await request(filmEndPoint);
-    const jsonBody = JSON.parse(response);
-    return jsonBody.characters;
-  } catch (error) {
-    console.error('Error:', error);
-    return [];
-  }
-};
-
-const requestNames = async (characters) => {
-  try {
-    const promises = characters.map(async (character) => {
-      const response = await request(character);
-      const jsonBody = JSON.parse(response);
-      return jsonBody.name;
+function getCharacters(movieId) {
+  const filmUrl = `https://swapi.dev/api/films/${movieId}/`;
+  
+  return new Promise((resolve, reject) => {
+    request(filmUrl, (error, response, body) => {
+      if (error) {
+        reject(error);
+      } else {
+        const filmData = JSON.parse(body);
+        const characterUrls = filmData.characters;
+        const characterNames = [];
+        
+        Promise.all(characterUrls.map(url => fetchCharacterName(url)))
+          .then(names => resolve(names))
+          .catch(error => reject(error));
+      }
     });
-    return Promise.all(promises);
-  } catch (error) {
-    console.error('Error:', error);
-    return [];
-  }
-};
+  });
+}
 
-const getCharNames = async () => {
-  try {
-    const characters = await requestCharacters();
-    if (characters.length > 0) {
-      const charNames = await requestNames(characters);
-      process.stdout.write(charNames.join('\n') + '\n');
-    } else {
-      console.error('Error: Got no Characters for some reason');
-    }
-  } catch (error) {
-    console.error('Error:', error);
-  }
-};
+function fetchCharacterName(characterUrl) {
+  return new Promise((resolve, reject) => {
+    request(characterUrl, (error, response, body) => {
+      if (error) {
+        reject(error);
+      } else {
+        const characterData = JSON.parse(body);
+        resolve(characterData.name);
+      }
+    });
+  });
+}
 
-getCharNames();
+function main() {
+  const args = process.argv.slice(2);
+  
+  if (args.length !== 1) {
+    console.error('Usage: node script_name.js movie_id');
+    process.exit(1);
+  }
+  
+  const movieId = args[0];
+  
+  getCharacters(movieId)
+    .then(characterNames => {
+      if (characterNames.length === 0) {
+        console.log('No characters found for the provided movie ID.');
+      } else {
+        characterNames.forEach(name => console.log(name));
+      }
+    })
+    .catch(error => {
+      console.error('An error occurred:', error);
+    });
+}
+
+main();
+
+
 
