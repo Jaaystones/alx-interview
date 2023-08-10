@@ -1,49 +1,53 @@
-#!/usr/bin/env node
+#!/usr/bin/node
 
-const request = require('request-promise-native');
+const request = require('request');
 
 const movieId = process.argv[2];
-const filmEndPoint = `https://swapi-api.hbtn.io/api/films/${movieId}`;
+const filmEndPoint = 'https://swapi-api.hbtn.io/api/films/' + movieId;
+let people = [];
 const names = [];
 
 const requestCharacters = async () => {
-  try {
-    const response = await request(filmEndPoint);
-    const jsonBody = JSON.parse(response);
-    return jsonBody.characters;
-  } catch (error) {
-    console.error('Error:', error);
-    return [];
-  }
+  await new Promise(resolve => request(filmEndPoint, (err, res, body) => {
+    if (err || res.statusCode !== 200) {
+      console.error('Error: ', err, '| StatusCode: ', res.statusCode);
+    } else {
+      const jsonBody = JSON.parse(body);
+      people = jsonBody.characters;
+      resolve();
+    }
+  }));
 };
 
-const requestNames = async (characters) => {
-  try {
-    const promises = characters.map(async (character) => {
-      const response = await request(character);
-      const jsonBody = JSON.parse(response);
-      return jsonBody.name;
-    });
-    return Promise.all(promises);
-  } catch (error) {
-    console.error('Error:', error);
-    return [];
+const requestNames = async () => {
+  if (people.length > 0) {
+    for (const p of people) {
+      await new Promise(resolve => request(p, (err, res, body) => {
+        if (err || res.statusCode !== 200) {
+          console.error('Error: ', err, '| StatusCode: ', res.statusCode);
+        } else {
+          const jsonBody = JSON.parse(body);
+          names.push(jsonBody.name);
+          resolve();
+        }
+      }));
+    }
+  } else {
+    console.error('Error: Got no Characters for some reason');
   }
 };
 
 const getCharNames = async () => {
-  try {
-    const characters = await requestCharacters();
-    if (characters.length > 0) {
-      const charNames = await requestNames(characters);
-      process.stdout.write(charNames.join('\n') + '\n');
+  await requestCharacters();
+  await requestNames();
+
+  for (const n of names) {
+    if (n === names[names.length - 1]) {
+      process.stdout.write(n);
     } else {
-      console.error('Error: Got no Characters for some reason');
+      process.stdout.write(n + '\n');
     }
-  } catch (error) {
-    console.error('Error:', error);
   }
 };
 
 getCharNames();
-
