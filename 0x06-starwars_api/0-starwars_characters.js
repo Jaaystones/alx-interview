@@ -1,64 +1,25 @@
-#!/usr/bin/env node
-
+#!/usr/bin/node
 const request = require('request');
+const API_URL = 'https://swapi-api.hbtn.io/api';
 
-function getCharacters(movieId) {
-  const filmUrl = `https://swapi.dev/api/films/${movieId}/`;
-  
-  return new Promise((resolve, reject) => {
-    request(filmUrl, (error, response, body) => {
-      if (error) {
-        reject(error);
-      } else {
-        const filmData = JSON.parse(body);
-        const characterUrls = filmData.characters;
-        const characterNames = [];
-        
-        Promise.all(characterUrls.map(url => fetchCharacterName(url)))
-          .then(names => resolve(names))
-          .catch(error => reject(error));
-      }
-    });
+if (process.argv.length > 2) {
+  request(`${API_URL}/films/${process.argv[2]}/`, (err, _, body) => {
+    if (err) {
+      console.log(err);
+    }
+    const charactersURL = JSON.parse(body).characters;
+    const charactersName = charactersURL.map(
+      url => new Promise((resolve, reject) => {
+        request(url, (promiseErr, __, charactersReqBody) => {
+          if (promiseErr) {
+            reject(promiseErr);
+          }
+          resolve(JSON.parse(charactersReqBody).name);
+        });
+      }));
+
+    Promise.all(charactersName)
+      .then(names => console.log(names.join('\n')))
+      .catch(allErr => console.log(allErr));
   });
 }
-
-function fetchCharacterName(characterUrl) {
-  return new Promise((resolve, reject) => {
-    request(characterUrl, (error, response, body) => {
-      if (error) {
-        reject(error);
-      } else {
-        const characterData = JSON.parse(body);
-        resolve(characterData.name);
-      }
-    });
-  });
-}
-
-function main() {
-  const args = process.argv.slice(2);
-  
-  if (args.length !== 1) {
-    console.error('Usage: node script_name.js movie_id');
-    process.exit(1);
-  }
-  
-  const movieId = args[0];
-  
-  getCharacters(movieId)
-    .then(characterNames => {
-      if (characterNames.length === 0) {
-        console.log('No characters found for the provided movie ID.');
-      } else {
-        characterNames.forEach(name => console.log(name));
-      }
-    })
-    .catch(error => {
-      console.error('An error occurred:', error);
-    });
-}
-
-main();
-
-
-
